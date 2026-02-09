@@ -1,75 +1,61 @@
 #include <iostream>
 using namespace std;
 
-// Merge two sorted parts of array: [start..mid] and [mid+1..end]
-void mergeArrays(int *arr, int start, int end) {
+// Merge two sorted parts
+void merge(int *arr, int s, int e) {
 
-    int mid = (start + end) / 2;
+    int mid = (s + e) / 2;
 
-    // Length of left and right subarrays
-    int leftSize = mid - start + 1;
-    int rightSize = end - mid;
+    int n1 = mid - s + 1;
+    int n2 = e - mid;
 
-    // Create temporary arrays
-    int *left = new int[leftSize];
-    int *right = new int[rightSize];
+    int *L = new int[n1];
+    int *R = new int[n2];
 
-    // Copy data into left array
-    int mainIndex = start;
-    for(int i = 0; i < leftSize; i++) {
-        left[i] = arr[mainIndex++];
+    int k = s;
+
+    // copy left
+    for(int i = 0; i < n1; i++)
+        L[i] = arr[k++];
+
+    // copy right
+    k = mid + 1;
+    for(int i = 0; i < n2; i++)
+        R[i] = arr[k++];
+
+    int i = 0, j = 0;
+    k = s;
+
+    // merge
+    while(i < n1 && j < n2) {
+        if(L[i] < R[j])
+            arr[k++] = L[i++];
+        else
+            arr[k++] = R[j++];
     }
 
-    // Copy data into right array
-    mainIndex = mid + 1;
-    for(int i = 0; i < rightSize; i++) {
-        right[i] = arr[mainIndex++];
-    }
+    // remaining left
+    while(i < n1)
+        arr[k++] = L[i++];
 
-    // Merge both sorted arrays back into original array
-    int leftIndex = 0;
-    int rightIndex = 0;
-    mainIndex = start;
+    // remaining right
+    while(j < n2)
+        arr[k++] = R[j++];
 
-    while(leftIndex < leftSize && rightIndex < rightSize) {
-        if(left[leftIndex] < right[rightIndex]) {
-            arr[mainIndex++] = left[leftIndex++];
-        } else {
-            arr[mainIndex++] = right[rightIndex++];
-        }
-    }
-
-    // Copy remaining elements of left array (if any)
-    while(leftIndex < leftSize) {
-        arr[mainIndex++] = left[leftIndex++];
-    }
-
-    // Copy remaining elements of right array (if any)
-    while(rightIndex < rightSize) {
-        arr[mainIndex++] = right[rightIndex++];
-    }
-
-    // Free dynamically allocated memory
-    delete[] left;
-    delete[] right;
+    delete[] L;
+    delete[] R;
 }
 
-// Recursive Merge Sort function
-void mergeSort(int *arr, int start, int end) {
+void sortArr(int *arr, int s, int e) {
 
-    // Base case: single element
-    if(start >= end) return;
+    if(s >= e) return;
 
-    int mid = (start + end) / 2;
+    int mid = (s + e) / 2;
 
-    // Sort left half
-    mergeSort(arr, start, mid);
+    sortArr(arr, s, mid);
+    sortArr(arr, mid + 1, e);
 
-    // Sort right half
-    mergeSort(arr, mid + 1, end);
-
-    // Merge both halves
-    mergeArrays(arr, start, end);
+    merge(arr, s, e);
 }
 
 int main() {
@@ -77,13 +63,10 @@ int main() {
     int arr[15] = {3,7,0,1,5,8,3,2,34,66,87,23,12,12,12};
     int n = 15;
 
-    // Perform Merge Sort
-    mergeSort(arr, 0, n - 1);
+    sortArr(arr, 0, n - 1);
 
-    // Print sorted array
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++)
         cout << arr[i] << " ";
-    }
 
     return 0;
 }
